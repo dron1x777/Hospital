@@ -1,30 +1,26 @@
 package DataBase;
 
-import Model.Doctor;
-import Model.Hospital;
+import Model.Account;
+import Model.Transaction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataBase {
-    private Hospital[] hospitals;
-    private int size = 0;
+    private List<Account> Accounts = new ArrayList<>();
 
-    public DataBase(Hospital[] hospitals) {
-        this.hospitals = hospitals;
-        this.size = hospitals.length;
+    public List<Account> getAccounts() {
+        return Accounts;
     }
 
-    public Hospital[] getHospitals() {
-        return hospitals;
+    public void setAccounts(List<Account> accounts) {
+        Accounts = accounts;
     }
 
-    public void setHospitals(Hospital[] hospitals) {
-        this.hospitals = hospitals;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
+    @Override
+    public String toString() {
+        return "DataBase{" +
+                "Accounts=" + Accounts +
+                '}';
     }
 }

@@ -1,109 +1,144 @@
-import DataBase.DataBase;
-import Model.Hospital;
-import Model.enums.City;
-import Model.exceptions.HospitalNotFound;
-import Service.HospitalService;
-import Service.ServiceImpl.HospitalServiceImpl;
-import dao.daoImple.HospitalDaoImpl;
 
-import java.util.Arrays;
+import Model.Account;
+import Model.enums.AccountType;
+import Model.exceptions.InsufficientFundsException;
+import Service.ServiceImpl.AccountServiceImpl;
+
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InsufficientFundsException {
         Scanner sc = new Scanner(System.in);
-        DataBase dataBase = new DataBase(new Hospital[]{});
-        HospitalDaoImpl hospitalDao = new HospitalDaoImpl(dataBase);
-        HospitalService hospitalService = new HospitalServiceImpl(hospitalDao);
+        AccountServiceImpl accountServiceImpl = new AccountServiceImpl();
+        String name = "";
+        AccountType  accountType = null;
+        long ID = 0;
+        double amount = 0;
+        int choose2 = 0;
         while (true) {
             menu();
             System.out.println("Enter your choice:");
             int choice = sc.nextInt();
             switch (choice) {
-                case 1 -> {
-                    System.out.println("Enter hospital name:");
-                    String hospitalName = sc.next();
-                    System.out.println("Enter hospital address:");
-                    String hospitalAddress = sc.next();
-                    System.out.println("Enter hospital city:");
-                    String hospitalCity = sc.next().toUpperCase();
-                    City city = City.valueOf(hospitalCity);
-                    System.out.println("Enter hospital capacity:");
-                    int capacity = sc.nextInt();
-                    Hospital hospital = new Hospital(hospitalName, hospitalAddress, city, capacity, 0
-                    );
+                case 1:
+                    System.out.println("Enter owner name: ");
+                    name = sc.next();
+                    System.out.println("Enter account type (1 - Savings, 2 - Checking, 3 - Credit): ");
+                    choose2 = sc.nextInt();
+                    if (choose2 == 1) {
+                        accountType = AccountType.SAVINGS;
+                    }
+                    if (choose2 == 2) {
+                        accountType = AccountType.CHECKING;
+                    }
+                    if (choose2 == 3) {
+                        accountType = AccountType.CREDIT;
+                    }
                     try {
-                        hospitalService.createHospital(hospital);
-                    } catch (HospitalNotFound e) {
+                        accountServiceImpl.createAccount(new Account(name,accountType));
+                    } catch (InsufficientFundsException e) {
                         System.out.println(e.getMessage());
                     }
-                }
-                case 2 -> {
-                    Hospital[] hospitals = hospitalService.getHospitals();
-                    System.out.println(Arrays.toString(hospitals));
-                }
-                case 3 -> {
-                    System.out.println("Enter city:");
-                    String hospitalCity = sc.next().toUpperCase();
-                    City city = City.valueOf(hospitalCity);
-                    Hospital hospital = hospitalService.getHospitalByCity(city);
-                    if (hospital != null) {
-                        System.out.println(hospital);
-                    } else {System.out.println("Hospital not found");
-                    }
-                }
-                case 4 -> {
-                    System.out.println("Enter hospital id:");
-                    int id = sc.nextInt();
+                    break;
+                case 2:
+                    System.out.println("Enter owner ID: ");
+                    ID = sc.nextLong();
                     try {
-                        System.out.println(hospitalService.getOneHospital(id));
-                    } catch (HospitalNotFound e) {
+                        System.out.println(accountServiceImpl.getAccountById(ID));
+                    } catch (InsufficientFundsException e) {
                         System.out.println(e.getMessage());
                     }
-                }
-                case 5 -> {
-                    System.out.println("Enter hospital id to delete:");
-                    int id = sc.nextInt();
+                    break;
+                case 3:
+                    System.out.println("Enter account type (1 - Savings, 2 - Checking, 3 - Credit): ");
+                    choose2 = sc.nextInt();
+                    if (choose2 == 1) {
+                        accountType = AccountType.SAVINGS;
+                    } else if (choose2 == 2) {
+                        accountType = AccountType.CHECKING;
+                    } else if (choose2 == 3) {
+                        accountType = AccountType.CREDIT;
+                    } else {
+                        System.out.println("Wrong account type");
+                        break;
+                    }
                     try {
-                        hospitalService.deleteHospital(id);
-                    } catch (HospitalNotFound e) {
+                        System.out.println(accountServiceImpl.getAccountByType(accountType));
+                    } catch (InsufficientFundsException e) {
                         System.out.println(e.getMessage());
                     }
-                }
-                case 6-> {
-                    System.out.println("Enter hospital id to update:");
-                    int id = sc.nextInt();
-                    System.out.println("Enter new name:");
-                    String name = sc.next();
-                    System.out.println("Enter new address:");
-                    String address = sc.next();
-                    System.out.println("Enter new city:");
-                    String cityStr = sc.next().toUpperCase();
-                    City city = City.valueOf(cityStr);
-                    System.out.println("Enter new capacity:");
-                    int capacity = sc.nextInt();
-                    Hospital hospital = new Hospital(name, address, city, capacity, 0
-                    );
+                    break;
+                case 4:
+                    System.out.println("Enter account ID: ");
+                    ID = sc.nextLong();
+                    System.out.println("Enter amount: ");
+                    amount = sc.nextDouble();
                     try {
-                        hospitalService.updateHospital(id, hospital);
-                    } catch (HospitalNotFound e) {
+                        accountServiceImpl.deposit(ID, amount);
+                    } catch (InsufficientFundsException e) {
                         System.out.println(e.getMessage());
                     }
-                }
-                default -> System.out.println("Wrong choice");
+                    break;
+                case 5:
+                    System.out.println("Enter account ID: ");
+                    ID = sc.nextLong();
+                    System.out.println("Enter amount: ");
+                    amount = sc.nextDouble();
+                    try {
+                        accountServiceImpl.withdraw(ID, amount);
+                    } catch (InsufficientFundsException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                case 6:
+                    System.out.println("Enter account ID: ");
+                    ID = sc.nextLong();
+                    try {
+                        accountServiceImpl.deleteAccountById(ID);
+                    } catch (InsufficientFundsException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                case 7:
+                    System.out.println("Enter ID: ");
+                    ID = sc.nextLong();
+                    try {
+                        System.out.println(accountServiceImpl.getTransactionsHistory(ID));
+                    } catch (InsufficientFundsException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                case 8:
+                    System.out.println("Enter ID: ");
+                    ID = sc.nextLong();
+                    try {
+                        accountServiceImpl.getTotalBalance(ID);
+                    } catch (InsufficientFundsException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                    case 9:
+                        System.out.println("End");
+                        System.exit(0);
+                    default:
+                        System.out.println("Invalid choice");
+                        break;
+
             }
         }
     }
     static void menu() {
         System.out.println("""
-                
-                1. Create hospital
-                2. Get all hospitals
-                3. Get hospital by city
-                4. Get hospital by id
-                5. Delete hospital by id
-                6. Update hospital by id
-                
+                Welcome ACCOUNT management!
+                1. Create account
+                2. Get account by ID
+                3. Get account by type
+                4. Deposit
+                5. Withdraw
+                6. Delete account by ID
+                7. Get transactions history
+                8. Get total balance
+                9. EXIT
                 """);
     }
 }
